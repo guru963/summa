@@ -54,7 +54,7 @@ export const DEMO_CHARITIES: Charity[] = [
     category: 'Medical Research',
     is_featured: false,
     is_active: true,
-    upcoming_events: null,
+    upcoming_events: undefined,
     created_at: new Date().toISOString(),
   },
   {
@@ -66,7 +66,7 @@ export const DEMO_CHARITIES: Charity[] = [
     category: 'International Aid',
     is_featured: false,
     is_active: true,
-    upcoming_events: null,
+    upcoming_events:undefined ,
     created_at: new Date().toISOString(),
   },
   {
