@@ -20,7 +20,8 @@ export default function DashboardPage() {
     } else if (payment === 'cancelled') {
       toast.error('Payment cancelled. You can try again anytime.')
     }
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
   const { scores, loading: scoresLoading } = useScores(user?.id)
   const selectedCharity = useCharity(user?.charity_id)
   const { draws, loading: drawsLoading } = useDraws()

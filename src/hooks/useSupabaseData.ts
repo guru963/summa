@@ -6,6 +6,37 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { GolfScore, Charity, Draw, DrawEntry, WinnerVerification } from '@/types'
 
+// ── Local types ───────────────────────────────────────────────
+export interface UserProfile {
+  id: string
+  email: string
+  full_name: string
+  subscription_status: string
+  subscription_plan: string | null
+  subscription_renewal_date: string | null
+  charity_id: string | null
+  charity_percentage: number
+  stripe_customer_id: string | null
+  role: string
+  created_at: string
+  updated_at: string
+}
+
+export interface VerificationWithRelations {
+  id: string
+  user_id: string
+  draw_id: string
+  proof_url: string
+  status: string
+  payment_status: string
+  admin_notes: string | null
+  created_at: string
+  reviewed_at: string | null
+  profiles?: { full_name: string; email: string }
+  draws?: { draw_month: string }
+}
+
+
 // ── Scores ───────────────────────────────────────────────────
 export function useScores(userId: string | undefined) {
   const [scores, setScores] = useState<GolfScore[]>([])
@@ -170,7 +201,7 @@ export function useTotalDonated(userId: string | undefined) {
 
 // ── Admin: all users ──────────────────────────────────────────
 export function useAllUsers() {
-  const [users, setUsers] = useState<any[]>([])
+  const [users, setUsers] = useState<UserProfile[]>([])
   const [loading, setLoading] = useState(true)
 
   const fetch = useCallback(async () => {
@@ -200,7 +231,7 @@ export function useAllDraws() {
 
 // ── Admin: all verifications with user + draw info ────────────
 export function useAllVerifications() {
-  const [verifications, setVerifications] = useState<any[]>([])
+  const [verifications, setVerifications] = useState<VerificationWithRelations[]>([])
   const [loading, setLoading] = useState(true)
 
   const fetch = useCallback(async () => {
@@ -208,7 +239,7 @@ export function useAllVerifications() {
       .from('winner_verifications')
       .select('*, profiles(full_name, email), draws(draw_month)')
       .order('created_at', { ascending: false })
-    setVerifications(data ?? [])
+    setVerifications((data ?? []) as VerificationWithRelations[])
     setLoading(false)
   }, [])
 
@@ -258,7 +289,8 @@ export async function publishDraw(drawData: {
 
   if (subscribers && draw) {
     for (const sub of subscribers) {
-      const scores: number[] = ((sub as any).golf_scores ?? []).map((s: any) => s.score)
+      const golfScores = (sub as { id: string; golf_scores: Array<{ score: number }> | null }).golf_scores ?? []
+      const scores: number[] = golfScores.map((s) => s.score)
       if (scores.length === 0) continue
       const matches = scores.filter(s => drawData.winning_numbers.includes(s)).length
       const matchType = matches >= 5 ? 5 : matches >= 4 ? 4 : matches >= 3 ? 3 : null

@@ -3,13 +3,14 @@ import { User, Heart, CreditCard, Save, ChevronRight, AlertCircle } from 'lucide
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
-import { DEMO_CHARITIES } from '@/lib/demoData'
+import { useCharities } from '@/hooks/useSupabaseData'
 import { formatDate, formatCurrency } from '@/lib/drawEngine'
 import toast from 'react-hot-toast'
 import { Link } from 'react-router-dom'
 
 export default function ProfilePage() {
   const { user, refreshUser } = useAuth()
+  const { charities } = useCharities()
   const [charityPct, setCharityPct] = useState(user?.charity_percentage || 10)
   const [fullName, setFullName] = useState(user?.full_name || '')
   const [saving, setSaving] = useState(false)
@@ -265,7 +266,7 @@ export default function ProfilePage() {
             <div className="card">
               <h3 className="font-display font-semibold text-dark-100 mb-4">Select Charity</h3>
               <div className="space-y-2">
-                {DEMO_CHARITIES.slice(0, 6).map(c => (
+                {charities.slice(0, 6).map((c) => (
                   <button
                     key={c.id}
                     onClick={() => setSelectedCharity(c.id)}

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Users, Trophy, Heart, BarChart3, Play, Eye, CheckCircle, XCircle, DollarSign, UserCheck, Shield, Loader2, RefreshCw } from 'lucide-react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { useAllUsers, useAllDraws, useAllCharities, useAllVerifications, useAdminStats, publishDraw, updateVerification, markPaid, toggleCharity } from '@/hooks/useSupabaseData'
-import { supabase } from '@/lib/supabase'
+import type { UserProfile, VerificationWithRelations } from '@/hooks/useSupabaseData'
 import { formatCurrency, formatDate, formatMonth, generateRandomDraw, generateAlgorithmicDraw, calculatePrizePool } from '@/lib/drawEngine'
 import toast from 'react-hot-toast'
 
@@ -323,7 +323,7 @@ export default function AdminPage() {
                   <p className="text-dark-500 text-sm text-center py-8">No verifications submitted yet</p>
                 ) : (
                   <div className="space-y-4">
-                    {verifications.map((v: any) => (
+                    {verifications.map((v: VerificationWithRelations) => (
                       <div key={v.id} className="border border-dark-700 rounded-xl p-4">
                         <div className="flex items-start justify-between gap-4 mb-3">
                           <div>

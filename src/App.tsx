@@ -95,13 +95,16 @@ function ProfileSetupScreen() {
   )
 }
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ProtectedRoute({ children, requireActive = false }: { children: React.ReactNode; requireActive?: boolean }) {
   const { user, loading, profileMissing } = useAuth()
   if (loading) return <LoadingScreen />
   if (profileMissing) return <ProfileSetupScreen />
   if (!user) return <Navigate to="/login" replace />
-  // Admins never see user pages — always send to admin panel
   if (user.role === 'admin') return <Navigate to="/admin" replace />
+  // Block inactive users from protected pages that require a subscription
+  if (requireActive && user.subscription_status !== 'active') {
+    return <Navigate to="/subscribe" replace />
+  }
   return <>{children}</>
 }
 
@@ -122,11 +125,11 @@ function AppRoutes() {
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/charities" element={<CharitiesPage />} />
       <Route path="/subscribe" element={<SubscribePage />} />
-      <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-      <Route path="/scores" element={<ProtectedRoute><ScoresPage /></ProtectedRoute>} />
-      <Route path="/draw" element={<ProtectedRoute><DrawPage /></ProtectedRoute>} />
+      <Route path="/dashboard" element={<ProtectedRoute requireActive><DashboardPage /></ProtectedRoute>} />
+      <Route path="/scores" element={<ProtectedRoute requireActive><ScoresPage /></ProtectedRoute>} />
+      <Route path="/draw" element={<ProtectedRoute requireActive><DrawPage /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-      <Route path="/winners" element={<ProtectedRoute><WinnersPage /></ProtectedRoute>} />
+      <Route path="/winners" element={<ProtectedRoute requireActive><WinnersPage /></ProtectedRoute>} />
       <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
